@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+</html>
+
+<head>
+    <title>Webpresenter</title>
+</head>
+
+<body>
+    <div class="connection-messages">
+    </div>
+    <div class="container">
+    </div>
+    <div class="current-slide"></div>
+
+    <div>
+        <button onclick="getCurrentPresentationSlides()">Get current presentation slides</button>
+    </div>
+
+    <script>
+        const socket = new WebSocket('ws://localhost:50001/remote');
+        const connected = document.createElement('div');
+        connected.innerHTML = 'Connected to server';
+        const authenticated = document.createElement('div');
+        authenticated.innerHTML = 'Authenticated';
+
+        socket.onopen = function (event) {
+            document.querySelector('.connection-messages').appendChild(connected);
+            authenticate();
+        };
+        socket.onmessage = function (event) {
+            const returnData = deseralizeJSON(event.data);
+
+            if (returnData.action === 'authenticate') {
+                authenticateHandler(returnData);
+            }
+            else if (returnData.action === 'presentationCurrent') {
+                presentationCurrentHandler(returnData);
+                subscribeToPresentationTriggerIndex();
+            }
+            else if (returnData.action === 'presentationTriggerIndex') {
+                presentationTriggerIndexHandler(returnData);
+            }
+        };
+
+        function authenticate() {
+            const authenticationRequest = JSON.stringify({
+                "controller": 1,
+                "authenticated": 1,
+                "error": "",
+                "majorVersion": 7,
+                "minorVersion": 16,
+                "action": "authenticate",
+                "protocol": 701,
+                "password": "12345"
+            });
+
+            socket.send(authenticationRequest);
+        }
+
+        function getCurrentPresentationSlides() {
+            const presentationRequest = JSON.stringify({
+                "action": "presentationCurrent"
+            });
+
+            socket.send(presentationRequest);
+        }
+
+        function subscribeToPresentationTriggerIndex() {
+            const indexRequest = JSON.stringify({
+                "action": "presentationTriggerIndex__sub"
+            });
+        }
+
+        function authenticateHandler(returnData) {
+            if (returnData.authenticated === 0) {
+                const error = document.createElement('div');
+                error.innerHTML = returnData.error;
+                document.querySelector('.connection-messages').appendChild(error);
+                return;
+            }
+            document.querySelector('.connection-messages').appendChild(authenticated);
+            return;
+        }
+
+        function presentationCurrentHandler(returnData) {
+            const container = document.querySelector('.container');
+            container.innerHTML = '';
+
+            for (let i = 0; i < returnData.presentation.presentationSlideGroups.length; i++) {
+                const slideGroup = returnData.presentation.presentationSlideGroups[i];
+
+                for (let j = 0; j < slideGroup.groupSlides.length; j++) {
+                    const slide = slideGroup.groupSlides[j];
+                    const slideElement = document.createElement('div');
+                    slideElement.innerHTML = slide.slideText;
+                    container.appendChild(slideElement);
+                }
+            }
+        }
+
+        function presentationTriggerIndexHandler(returnData) {
+            const container = document.querySelector('.current-slide');
+            container.innerHTML = returnData.slideIndex;
+        }
+
+        function deseralizeJSON(data) {
+            return JSON.parse(data);
+        }
+    </script>
+</body>
+
+</html>
