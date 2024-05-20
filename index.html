@@ -5,6 +5,16 @@
 
 <head>
     <title>Webpresenter</title>
+
+    <style>
+        .container div:not(.isVisible) {
+            display: none;
+        }
+
+        .container div {
+            font-size: 50px;
+        }
+    </style>
 </head>
 
 <body>
@@ -12,7 +22,6 @@
     </div>
     <div class="container">
     </div>
-    <div class="current-slide"></div>
 
     <div>
         <button onclick="getCurrentPresentationSlides()">Get current presentation slides</button>
@@ -31,18 +40,21 @@
         };
         socket.onmessage = function (event) {
             const returnData = deseralizeJSON(event.data);
+            handleMessages(returnData);
+        };
 
+        function handleMessages(returnData) {
             if (returnData.action === 'authenticate') {
                 authenticateHandler(returnData);
+                subscribeToPresentationTriggerIndex();
             }
             else if (returnData.action === 'presentationCurrent') {
                 presentationCurrentHandler(returnData);
-                subscribeToPresentationTriggerIndex();
             }
             else if (returnData.action === 'presentationTriggerIndex') {
                 presentationTriggerIndexHandler(returnData);
             }
-        };
+        }
 
         function authenticate() {
             const authenticationRequest = JSON.stringify({
@@ -101,8 +113,13 @@
         }
 
         function presentationTriggerIndexHandler(returnData) {
-            const container = document.querySelector('.current-slide');
-            container.innerHTML = returnData.slideIndex;
+            const container = document.querySelectorAll('.container div');
+
+            for (let i = 0; i < container.length; i++) {
+                container[i].classList.remove('isVisible');
+            }
+
+            container[returnData.slideIndex].classList.add('isVisible');
         }
 
         function deseralizeJSON(data) {
