@@ -14,6 +14,10 @@
         .container div {
             font-size: 50px;
         }
+
+        .letter_a {
+            color: red;
+        }
     </style>
 </head>
 
@@ -106,7 +110,12 @@
                 for (let j = 0; j < slideGroup.groupSlides.length; j++) {
                     const slide = slideGroup.groupSlides[j];
                     const slideElement = document.createElement('div');
-                    slideElement.innerHTML = slide.slideText;
+                    for (let k = 0; k < slide.slideText.length; k++) {
+                        const slideTextSpan = document.createElement('span');
+                        slideTextSpan.classList.add('letter_' + slide.slideText[k].trim());
+                        slideTextSpan.innerHTML = slide.slideText[k];
+                        slideElement.appendChild(slideTextSpan);
+                    }
                     container.appendChild(slideElement);
                 }
             }
