@@ -8,14 +8,21 @@
 
     <style>
         .container div:not(.isVisible) {
-            display: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .container div.isVisible {
+            opacity: 1;
+            transition: opacity 0.5s;
         }
 
         .container div {
             font-size: 50px;
+            position: absolute;
         }
 
-        .letter_a {
+        .letter_a_red {
             color: red;
         }
     </style>
@@ -37,10 +44,12 @@
         connected.innerHTML = 'Connected to server';
         const authenticated = document.createElement('div');
         authenticated.innerHTML = 'Authenticated';
+        let previousIndex = -1;
 
         socket.onopen = function (event) {
             document.querySelector('.connection-messages').appendChild(connected);
             authenticate();
+            getCurrentPresentationSlides();
         };
         socket.onmessage = function (event) {
             const returnData = deseralizeJSON(event.data);
@@ -122,13 +131,27 @@
         }
 
         function presentationTriggerIndexHandler(returnData) {
+            if (previousIndex === returnData.slideIndex) {
+                return;
+            }
+            previousIndex = returnData.slideIndex;
+
             const container = document.querySelectorAll('.container div');
 
-            for (let i = 0; i < container.length; i++) {
-                container[i].classList.remove('isVisible');
+            const visibleContainers = document.querySelectorAll('.container div.isVisible');
+
+            if (visibleContainers.length === 0) {
+                container[returnData.slideIndex].classList.add('isVisible');
+                return;
             }
 
-            container[returnData.slideIndex].classList.add('isVisible');
+            turnSelectedLetterRed();
+        }
+
+        function turnSelectedLetterRed() {
+            document.querySelectorAll('.letter_a').forEach((element) => {
+                element.classList.add('letter_a_red');
+            });
         }
 
         function deseralizeJSON(data) {
