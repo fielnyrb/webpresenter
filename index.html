@@ -135,6 +135,7 @@
                 return;
             }
             previousIndex = returnData.slideIndex;
+            const previousContainer = document.querySelector('.container div.isVisible');
 
             const container = document.querySelectorAll('.container div');
 
@@ -146,6 +147,13 @@
             }
 
             turnSelectedLetterRed();
+
+            let previousFirstA = previousContainer.querySelectorAll('.letter_a')[0];
+            let currentFirstA = container[returnData.slideIndex].querySelectorAll('.letter_a')[0];
+
+            //Move previousFirstA to the position of currentFirstA
+            previousFirstA.style.position = 'relative';
+            previousFirstA.style.left = currentFirstA.offsetLeft - previousFirstA.offsetLeft + 'px';
         }
 
         function turnSelectedLetterRed() {
