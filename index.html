@@ -134,7 +134,6 @@
             if (previousIndex === returnData.slideIndex) {
                 return;
             }
-            previousIndex = returnData.slideIndex;
             const previousContainer = document.querySelector('.container div.isVisible');
 
             const container = document.querySelectorAll('.container div');
@@ -143,6 +142,7 @@
 
             if (visibleContainers.length === 0) {
                 container[returnData.slideIndex].classList.add('isVisible');
+                previousIndex = returnData.slideIndex;
                 return;
             }
 
@@ -154,6 +154,11 @@
             //Move previousFirstA to the position of currentFirstA
             previousFirstA.style.position = 'relative';
             previousFirstA.style.left = currentFirstA.offsetLeft - previousFirstA.offsetLeft + 'px';
+            previousFirstA.style.top = currentFirstA.offsetTop - previousFirstA.offsetTop + 'px';
+
+            container[previousIndex].classList.remove('isVisible');
+
+            previousIndex = returnData.slideIndex;
         }
 
         function turnSelectedLetterRed() {
