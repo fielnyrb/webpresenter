@@ -17,6 +17,11 @@
             transition: opacity 0.5s;
         }
 
+        .container div.isVisible.non_selected_not_visible span:not(.letter_a_red) {
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
         .container div {
             font-size: 50px;
             position: absolute;
@@ -148,17 +153,31 @@
 
             turnSelectedLetterRed();
 
-            let previousFirstA = previousContainer.querySelectorAll('.letter_a')[0];
-            let currentFirstA = container[returnData.slideIndex].querySelectorAll('.letter_a')[0];
+            setTimeout(() => {
+                console.log(1);
+                container[returnData.slideIndex].classList.add('non_selected_not_visible');
+                container[returnData.slideIndex].classList.add('isVisible');
 
-            //Move previousFirstA to the position of currentFirstA
-            previousFirstA.style.position = 'relative';
-            previousFirstA.style.left = currentFirstA.offsetLeft - previousFirstA.offsetLeft + 'px';
-            previousFirstA.style.top = currentFirstA.offsetTop - previousFirstA.offsetTop + 'px';
+                container[previousIndex].classList.remove('isVisible');
+                container[previousIndex].classList.remove('non_selected_not_visible');
 
-            container[previousIndex].classList.remove('isVisible');
+                setTimeout(() => {
+                    console.log(2);
+                    let previousFirstA = previousContainer.querySelectorAll('.letter_a')[0];
+                    let currentFirstA = container[returnData.slideIndex].querySelectorAll('.letter_a')[0];
 
-            previousIndex = returnData.slideIndex;
+                    //Move previousFirstA to the position of currentFirstA
+                    previousFirstA.style.position = 'relative';
+                    previousFirstA.style.left = currentFirstA.offsetLeft - previousFirstA.offsetLeft + 'px';
+                    previousFirstA.style.top = currentFirstA.offsetTop - previousFirstA.offsetTop + 'px';
+
+                    setTimeout(() => {
+                        container[returnData.slideIndex].classList.remove('non_selected_not_visible');
+                        previousIndex = returnData.slideIndex;
+                    }, 1000);
+                }, 1000);
+
+            }, 1000);
         }
 
         function turnSelectedLetterRed() {
