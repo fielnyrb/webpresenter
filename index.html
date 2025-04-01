@@ -7,14 +7,18 @@
     <title>Webpresenter</title>
 
     <style>
-        .container div:not(.isVisible) {
+        .container div:not(.isVisible) span {
             opacity: 0;
             transition: opacity 0.5s;
         }
 
-        .container div.isVisible {
+        .container div.isVisible span {
             opacity: 1;
             transition: opacity 0.5s;
+        }
+
+        .container .letter_a_red.opacityOne {
+            opacity: 1;
         }
 
         .container div.isVisible.non_selected_not_visible span:not(.letter_a_red) {
@@ -158,6 +162,8 @@
                 container[returnData.slideIndex].classList.add('non_selected_not_visible');
                 container[returnData.slideIndex].classList.add('isVisible');
 
+                previousContainer.querySelectorAll('.letter_a')[0].classList.add('opacityOne');
+
                 container[previousIndex].classList.remove('isVisible');
                 container[previousIndex].classList.remove('non_selected_not_visible');
 
@@ -168,8 +174,11 @@
 
                     //Move previousFirstA to the position of currentFirstA
                     previousFirstA.style.position = 'relative';
-                    previousFirstA.style.left = currentFirstA.offsetLeft - previousFirstA.offsetLeft + 'px';
-                    previousFirstA.style.top = currentFirstA.offsetTop - previousFirstA.offsetTop + 'px';
+                    // previousFirstA.style.left = currentFirstA.offsetLeft - previousFirstA.offsetLeft + 'px';
+                    // previousFirstA.style.top = currentFirstA.offsetTop - previousFirstA.offsetTop + 'px';
+                    // previousFirstA.classList.remove('opacityOne');
+
+                    animateElement(previousFirstA, previousFirstA.offsetLeft, previousFirstA.offsetTop, currentFirstA.offsetLeft, currentFirstA.offsetTop, 1000);
 
                     setTimeout(() => {
                         container[returnData.slideIndex].classList.remove('non_selected_not_visible');
@@ -188,6 +197,30 @@
 
         function deseralizeJSON(data) {
             return JSON.parse(data);
+        }
+
+        function animateElement(element, startX, startY, endX, endY, duration) {
+            const startTime = performance.now();
+
+            function animate(currentTime) {
+                const elapsedTime = currentTime - startTime;
+                const progress = Math.min(elapsedTime / duration, 1); // Ensure progress doesn't exceed 1
+
+                // Interpolate the position
+                const currentX = startX + (endX - startX) * progress;
+                const currentY = startY + (endY - startY) * progress;
+
+                // Apply the new position
+                element.style.left = currentX + 'px';
+                element.style.top = currentY + 'px';
+
+                // Continue the animation if not yet complete
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                }
+            }
+
+            requestAnimationFrame(animate);
         }
     </script>
 </body>
