@@ -174,15 +174,17 @@
 
                     //Move previousFirstA to the position of currentFirstA
                     previousFirstA.style.position = 'relative';
-                    // previousFirstA.style.left = currentFirstA.offsetLeft - previousFirstA.offsetLeft + 'px';
-                    // previousFirstA.style.top = currentFirstA.offsetTop - previousFirstA.offsetTop + 'px';
-                    // previousFirstA.classList.remove('opacityOne');
 
-                    animateElement(previousFirstA, previousFirstA.offsetLeft, previousFirstA.offsetTop, currentFirstA.offsetLeft, currentFirstA.offsetTop, 1000);
+                    let endX = currentFirstA.offsetLeft - previousFirstA.offsetLeft;
+                    let endY = currentFirstA.offsetTop - previousFirstA.offsetTop;
+
+                    animateElement(previousFirstA, 0, 0, endX, endY, 1000);
 
                     setTimeout(() => {
                         container[returnData.slideIndex].classList.remove('non_selected_not_visible');
                         previousIndex = returnData.slideIndex;
+
+                        previousFirstA.classList.remove('opacityOne');
                     }, 1000);
                 }, 1000);
 
